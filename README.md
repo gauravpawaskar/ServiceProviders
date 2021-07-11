@@ -21,6 +21,7 @@ docker push flagprotectors/linkedin:latest
 Tested in ubuntu VM on VMWare Player
 
 ```sh
+cd k8s_infa
 minikube start --vm-driver=none
 minikube addons enable ingress
 kubectl get pods -n ingress-nginx // To verify ingress installation
@@ -32,6 +33,5 @@ edit /etc/hosts file and add following line
 ```sh
 {minikube ip} flagprotectors.com
 kubectl create secret generic linkedin --from-literal CLIENT_ID={client_id} --from-literal CLIENT_SECRET={client_secret}
-kubectl apply -f frontend.yaml
-kubectl apply -f linkedin.yaml
+kubectl apply -f .
 ```
