@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: linkedin-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      component: linkedin
+  template:
+    metadata:
+      labels:
+        component: linkedin
+    spec:
+      containers:
+      - name: linkedin-pod
+        image: flagprotectors/linkedin:latest
+        env:
+          - name: CLIENT_ID
+            valueFrom: 
+              secretKeyRef: 
+                name: linkedin
+                key:  CLIENT_ID
+          - name: CLIENT_SECRET
+            valueFrom: 
+              secretKeyRef: 
+                name: linkedin
+                key:  CLIENT_SECRET
+        resources:
+          limits:
+            memory: "128Mi"
+            cpu: "500m"
+        ports:
+        - containerPort: 5000
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: linkedin-clusterip
+spec:
+  type: ClusterIP
+  selector:
+    component: linkedin
+  ports:
+  - port: 3001
+    targetPort: 5000

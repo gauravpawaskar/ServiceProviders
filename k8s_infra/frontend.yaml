@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      component: frontend
+  template:
+    metadata:
+      labels:
+        component: frontend
+    spec:
+      containers:
+      - name: frontend-pod
+        image: flagprotectors/frontend:latest
+        env:
+          - name: LINKEDIN_HOST 
+            value: linkedin-clusterip
+          - name: LINKEDIN_PORT
+            value: "3001"
+        resources:
+          limits:
+            memory: "128Mi"
+            cpu: "500m"
+        ports:
+        - containerPort: 5000
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: frontend-clusterip
+spec:
+  type: ClusterIP
+  selector:
+    component: frontend
+  ports:
+  - port: 3000
+    targetPort: 5000
