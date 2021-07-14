@@ -16,6 +16,10 @@ spec:
       - name: linkedin-pod
         image: flagprotectors/linkedin:latest
         env:
+          - name: DATABASE_HOST
+            value: database-clusterip
+          - name: DATABASE_PORT
+            value: "3100"
           - name: CLIENT_ID
             valueFrom: 
               secretKeyRef: 

@@ -1,3 +1,4 @@
+import json
 import os
 
 import requests
@@ -31,6 +32,19 @@ def processlogin():
     me_url = "https://api.linkedin.com/v2/me"
     auth_header = {"Authorization": "Bearer "+access_token}
     me_response = requests.get(url=me_url, headers=auth_header)
+    me_response_json = me_response.json()
+
+    # Store access token
+    database_host = os.environ['DATABASE_HOST']
+    database_port = os.environ['DATABASE_PORT']
+    database_url = "http://"+database_host+":"+database_port+"/token"
+    database_header = {'content-type': 'application/json'}
+    database_data = {
+        "user_id": me_response_json["id"], "service": "linkedin", "token": access_token}
+    database_response = requests.post(
+        url=database_url, data=json.dumps(database_data), headers=database_header)
+    app.logger.info(database_response.text)
+    #database_response_json = database_response.json()
 
     return me_response.text
 

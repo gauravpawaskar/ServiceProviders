@@ -1,0 +1,50 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: database-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      component: database
+  template:
+    metadata:
+      labels:
+        component: database
+    spec:
+      containers:
+      - name: database-pod
+        image: flagprotectors/database:latest
+        env:
+          - name: MONGO_HOST
+            value: mongodb-clusterip
+          - name: MONGO_PORT
+            value: '27017'
+          - name: MONGO_DB_USER
+            valueFrom: 
+              secretKeyRef: 
+                name: mongo
+                key:  MONGO_USER
+          - name: MONGO_DB_PSW
+            valueFrom: 
+              secretKeyRef: 
+                name: mongo
+                key:  MONGO_PASSWORD
+        resources:
+          limits:
+            memory: "128Mi"
+            cpu: "500m"
+        ports:
+        - containerPort: 5000
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: database-clusterip
+spec:
+  type: ClusterIP
+  selector:
+    component: database
+  ports:
+  - port: 3100
+    targetPort: 5000
