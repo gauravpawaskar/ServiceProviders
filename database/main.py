@@ -16,18 +16,49 @@ app.config["MONGO_URI"] = "mongodb://{}:{}@{}:{}/user_tokens".format(
 mongodb_client = PyMongo(app)
 db = mongodb_client.db
 tokens_collection = None
+service_collection = None
 
 
 def set_db():
     global tokens_collection
+    global service_collection
     collist = db.list_collection_names()
     if "tokens" not in collist:
-        tokens_collection = db["customers"]
+        tokens_collection = db["tokens"]
+    if "services" not in collist:
+        service_collection = db["services"]
 
 
 @app.route('/', methods=["GET"])
 def index():
     return "Success"
+
+
+@app.route('/service', methods=["GET", "POST"])
+def service():
+    if request.method == "POST":
+        service_details = request.get_json()
+        service_name = service_details["name"]
+        service_host = service_details["host"]
+        service_port = service_details["port"]
+        record = service_collection.find({"service": service_name})
+        if record.count() == 0:
+            service_collection.insert_one({"service": service_name, "service_data": {
+                                          "service_host": service_host, "service_port": service_port}})
+        else:
+            update_this = {"service": service_name}
+            update_values = {"$set": {"service_data": {
+                "service_host": service_host, "service_port": service_port}}}
+            service_collection.update_one(update_this, update_values)
+        return json.dumps({"service": service_name, "service_host": service_host, "service_port": service_port, "status": "success"})
+    elif request.method == "GET":
+        service_name = request.args.get('service_name')
+        record = service_collection.find({"service": service_name})
+        if record.count() != 0:
+            service_from_db = record[0]
+            return json.dumps({"service_name": service_name, "service_host": service_from_db["service_data"]["service_host"], "service_port": service_from_db["service_data"]["service_port"], "status": "success"})
+        else:
+            return json.dumps({"status": "fail"})
 
 
 @app.route('/token', methods=["GET", "POST"])
@@ -61,7 +92,7 @@ def token():
         user_id = request.args.get('user_id')
         service = request.args.get('service')
         record = tokens_collection.find({"user_id": user_id})
-        if len(record) != 0:
+        if record.count() != 0:
             tokens_from_db = record[0]["tokens"]
             for token in tokens_from_db:
                 if token["service"] == service:

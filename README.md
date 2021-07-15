@@ -1,31 +1,13 @@
 # OAuth / SAML testing
 
-## Frontend Docker build
+## Docker build
 
 If there is no code change then directly jump to minikube setup. Latest images are already built and uploaded to Docker hub.
 
 Else follow following sections as per code changes.
 
-```sh
-cd frontend
-docker build -t flagprotectors/frontend:latest .
-docker push flagprotectors/frontend:latest
 ```
-
-## Database Docker build
-
-```sh
-cd database
-docker build -t flagprotectors/database:latest .
-docker push flagprotectors/database:latest
-```
-
-## Services Docker build
-
-```sh
-cd linkedin
-docker build -t flagprotectors/linkedin:latest .
-docker push flagprotectors/linkedin:latest
+./build.sh
 ```
 
 ## Minikube Setup

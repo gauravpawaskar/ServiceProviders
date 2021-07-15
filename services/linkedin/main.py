@@ -7,6 +7,21 @@ from flask import Flask, request
 app = Flask(__name__)
 
 
+def register_service():
+    database_host = os.environ['DATABASE_HOST']
+    database_port = os.environ['DATABASE_PORT']
+    service_host = os.environ['SERVICE_HOST']
+    service_port = os.environ['SERVICE_PORT']
+    database_url = "http://"+database_host+":"+database_port+"/service"
+    database_header = {'content-type': 'application/json'}
+    database_data = {
+        "name": "linkedin", "host": service_host, "port": service_port
+    }
+    database_response = requests.post(
+        url=database_url, data=json.dumps(database_data), headers=database_header)
+    app.logger.info(database_response.text)
+
+
 @app.route('/', methods=["GET"])
 def index():
     return "Hello"
@@ -50,4 +65,5 @@ def processlogin():
 
 
 if __name__ == "__main__":
+    register_service()
     app.run(debug=True, host="0.0.0.0")
