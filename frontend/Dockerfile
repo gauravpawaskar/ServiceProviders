@@ -7,5 +7,6 @@ RUN pip install -r requirements.txt
 
 COPY *.py .
 COPY templates/ templates/
+COPY js/ js/
 
 CMD [ "python", "main.py" ]

@@ -5,44 +5,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login With Something</title>
-    <script>
-        var current_selected = null
-
-        function show_service(service_name){
-            if(service_name == "none"){
-                current_selected_div = document.getElementById(current_selected)
-                current_selected_div.style.display = "none"
-                current_selected = null
-            } else {
-                service_div = document.getElementById(service_name)
-                service_div.style.display = "block"
-                if(current_selected != null){
-                    current_selected_div = document.getElementById(current_selected)
-                    current_selected_div.style.display = "none"
-                }
-                current_selected = service_name
-            }
-        }
-
-        function redirectLogin(app){
-            if(app == "linkedin"){
-                client_id = document.getElementById(app+"_clientid").value
-                client_secret = document.getElementById(app+"_clientsecret").value
-                checkboxes = document.getElementsByName(app+"_scope")
-                checkboxesChecked_scope = [];
-                for (var i=0; i<checkboxes.length; i++) {
-                    if (checkboxes[i].checked) {
-                        checkboxesChecked_scope.push(checkboxes[i].value);
-                    }
-                }
-                checkboxesChecked_scope_string = checkboxesChecked_scope.join("%20")
-                url_string = "https://www.linkedin.com/oauth/v2/authorization?response_type=code&client_id="+client_id+"&redirect_uri=https://flagprotectors.com/oauth/"+app+"&state=foobar&scope="+checkboxesChecked_scope_string
-                alert(url_string)
-                location.replace(url_string)
-            }
-            
-        }
-    </script>
+    <script src="/js/main.js"></script>
 </head>
 <body>
     

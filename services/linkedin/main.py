@@ -6,6 +6,9 @@ from flask import Flask, request
 
 app = Flask(__name__)
 
+gloabal_client_id = None
+global_client_secret = None
+
 
 def register_service():
     database_host = os.environ['DATABASE_HOST']
@@ -27,14 +30,35 @@ def index():
     return "Hello"
 
 
+@app.route('/setup', methods=["POST"])
+def setup():
+    global gloabal_client_id
+    global global_client_secret
+    setup_data = request.get_json()
+    gloabal_client_id = setup_data["client_id"]
+    global_client_secret = setup_data["client_secret"]
+    app.logger.info(json.dumps({"status": "success"}))
+    return json.dumps({"status": "success"})
+
+
 @app.route('/processlogin')
 def processlogin():
+    global gloabal_client_id
+    global global_client_secret
     code = request.args.get('code')
     state = request.args.get('state')
     redirect_uri = "https://flagprotectors.com/oauth/linkedin"
     headers = {'content-type': 'application/x-www-form-urlencoded'}
-    client_id = os.environ['CLIENT_ID']
-    client_secret = os.environ['CLIENT_SECRET']
+    client_id = None
+    client_secret = None
+    if gloabal_client_id == None or global_client_secret == None:
+        app.logger.info("Using system set secret")
+        client_id = os.environ['CLIENT_ID']
+        client_secret = os.environ['CLIENT_SECRET']
+    else:
+        app.logger.info("Using Client provided secret")
+        client_id = gloabal_client_id
+        client_secret = global_client_secret
     auth_url = "https://www.linkedin.com/oauth/v2/accessToken"
     data = "grant_type=authorization_code&code="+code+"&redirect_uri=" + \
         redirect_uri+"&client_id="+client_id+"&client_secret="+client_secret
