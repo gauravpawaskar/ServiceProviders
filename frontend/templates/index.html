@@ -6,12 +6,62 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login With Something</title>
     <script>
+        var current_selected = null
+
+        function show_service(service_name){
+            if(service_name == "none"){
+                current_selected_div = document.getElementById(current_selected)
+                current_selected_div.style.display = "none"
+                current_selected = null
+            } else {
+                service_div = document.getElementById(service_name)
+                service_div.style.display = "block"
+                if(current_selected != null){
+                    current_selected_div = document.getElementById(current_selected)
+                    current_selected_div.style.display = "none"
+                }
+                current_selected = service_name
+            }
+        }
+
         function redirectLogin(app){
-            location.replace("https://www.linkedin.com/oauth/v2/authorization?response_type=code&client_id=86uqfrgpbglr9o&redirect_uri=https://flagprotectors.com/oauth/linkedin&state=foobar&scope=r_liteprofile%20r_emailaddress")
+            if(app == "linkedin"){
+                client_id = document.getElementById(app+"_clientid").value
+                client_secret = document.getElementById(app+"_clientsecret").value
+                checkboxes = document.getElementsByName(app+"_scope")
+                checkboxesChecked_scope = [];
+                for (var i=0; i<checkboxes.length; i++) {
+                    if (checkboxes[i].checked) {
+                        checkboxesChecked_scope.push(checkboxes[i].value);
+                    }
+                }
+                checkboxesChecked_scope_string = checkboxesChecked_scope.join("%20")
+                url_string = "https://www.linkedin.com/oauth/v2/authorization?response_type=code&client_id="+client_id+"&redirect_uri=https://flagprotectors.com/oauth/"+app+"&state=foobar&scope="+checkboxesChecked_scope_string
+                alert(url_string)
+                location.replace(url_string)
+            }
+            
         }
     </script>
 </head>
 <body>
-    <button onclick="redirectLogin('linkedin')">Login With LinkedIn</button>
+    
+    <label for="services">Select Service</label>
+    <select name="services" id="services" onchange="show_service(this.value)">
+        <option value="none" selected>None</option>
+        <option value="linkedin">LinkedIn</option>
+    </select>
+    <div id="linkedin" style="display: none;">
+        <br>
+        <label for="linkedin_clientid">Client_ID</label><input type="text" name="linkedin_clientid" id="linkedin_clientid"><br>
+
+        <label for="linkedin_clientsecret">Client_Secret</label><input type="text" name="linkedin_clientsecret" id="linkedin_clientsecret"><br>
+
+        <label>Scope</label>
+        <input type="checkbox" id="linkedin_scope" name="linkedin_scope" value="r_emailaddress">r_emailaddress</input>
+        <input type="checkbox" id="linkedin_scope" name="linkedin_scope" value="r_liteprofile">r_liteprofile</input>
+        <input type="checkbox" id="linkedin_scope" name="linkedin_scope" value="w_member_social">w_member_social</input>
+        <button onclick="redirectLogin('linkedin')">Login With LinkedIn</button>
+    </div>
 </body>
 </html>
