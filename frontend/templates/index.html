@@ -13,6 +13,7 @@
     <select name="services" id="services" onchange="show_service(this.value)">
         <option value="none" selected>None</option>
         <option value="linkedin">LinkedIn</option>
+        <option value="auth0">Auth0</option>
     </select>
     <div id="linkedin" style="display: none;">
         <br>
@@ -25,6 +26,19 @@
         <input type="checkbox" id="linkedin_scope" name="linkedin_scope" value="r_liteprofile">r_liteprofile</input>
         <input type="checkbox" id="linkedin_scope" name="linkedin_scope" value="w_member_social">w_member_social</input>
         <button onclick="redirectLogin('linkedin')">Login With LinkedIn</button>
+    </div>
+
+    <div id="auth0" style="display: none;">
+        <br>
+        <label for="auth0_clientid">Client_ID</label><input type="text" name="auth0_clientid" id="auth0_clientid"><br>
+
+        <label for="auth0_clientsecret">Client_Secret</label><input type="text" name="auth0_clientsecret" id="auth0_clientsecret"><br>
+
+        <label>Scope</label>
+        <input type="checkbox" id="auth0_scope" name="auth0_scope" value="openid">openid</input>
+        <input type="checkbox" id="auth0_scope" name="auth0_scope" value="profile">profile</input>
+        <input type="checkbox" id="auth0_scope" name="auth0_scope" value="email">email</input>
+        <button onclick="redirectLogin('auth0')">Login With auth0</button>
     </div>
 </body>
 </html>

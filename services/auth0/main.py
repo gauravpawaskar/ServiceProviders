@@ -1,10 +1,31 @@
 import json
 import os
+import random
+import string
+from logging.config import dictConfig
 
 import requests
 from flask import Flask, request
 
+dictConfig({
+    'version': 1,
+    'formatters': {'default': {
+        'format': '[%(asctime)s] %(levelname)s in %(module)s: %(message)s',
+    }},
+    'handlers': {'wsgi': {
+        'class': 'logging.StreamHandler',
+        'formatter': 'default'
+    }},
+    'root': {
+        'level': 'DEBUG',
+        'handlers': ['wsgi']
+    }
+})
+
 app = Flask(__name__)
+app.secret_key = ''.join(random.choices(
+    string.ascii_uppercase + string.ascii_lowercase + string.digits, k=15))
+
 
 global_client_id = None
 global_client_secret = None
@@ -18,11 +39,15 @@ def register_service():
     database_url = "http://"+database_host+":"+database_port+"/service"
     database_header = {'content-type': 'application/json'}
     database_data = {
-        "name": "linkedin", "host": service_host, "port": service_port
+        "name": "auth0", "host": service_host, "port": service_port
     }
     database_response = requests.post(
         url=database_url, data=json.dumps(database_data), headers=database_header)
     app.logger.info(database_response.text)
+
+
+def logInfo(message):
+    app.logger.info(message)
 
 
 @app.route('/', methods=["GET"])
@@ -34,32 +59,26 @@ def index():
 def setup():
     global global_client_id
     global global_client_secret
+    logInfo(request.get_data())
     setup_data = request.get_json()
     global_client_id = setup_data["client_id"]
     global_client_secret = setup_data["client_secret"]
-    app.logger.info(json.dumps({"status": "success"}))
+    logInfo(json.dumps({"status": "success"}))
     return json.dumps({"status": "success"})
 
 
 @app.route('/processlogin')
 def processlogin():
-    global global_client_id
-    global global_client_secret
     code = request.args.get('code')
     state = request.args.get('state')
-    redirect_uri = "https://flagprotectors.com/oauth/linkedin"
+    redirect_uri = "https://flagprotectors.com/oauth/auth0"
     headers = {'content-type': 'application/x-www-form-urlencoded'}
     client_id = None
     client_secret = None
-    if global_client_id == None or global_client_secret == None:
-        app.logger.info("Using system set secret")
-        client_id = os.environ['CLIENT_ID']
-        client_secret = os.environ['CLIENT_SECRET']
-    else:
-        app.logger.info("Using Client provided secret")
-        client_id = global_client_id
-        client_secret = global_client_secret
-    auth_url = "https://www.linkedin.com/oauth/v2/accessToken"
+    app.logger.info("Using Client provided secret")
+    client_id = global_client_id
+    client_secret = global_client_secret
+    auth_url = 'https://flagprotectors.us.auth0.com/oauth/token'
     data = "grant_type=authorization_code&code="+code+"&redirect_uri=" + \
         redirect_uri+"&client_id="+client_id+"&client_secret="+client_secret
     access_code_response = requests.post(
@@ -68,7 +87,7 @@ def processlogin():
     access_code_response_json = access_code_response.json()
     access_token = access_code_response_json["access_token"]
 
-    me_url = "https://api.linkedin.com/v2/me"
+    me_url = "https://flagprotectors.us.auth0.com/userinfo"
     auth_header = {"Authorization": "Bearer "+access_token}
     me_response = requests.get(url=me_url, headers=auth_header)
     me_response_json = me_response.json()
@@ -79,7 +98,7 @@ def processlogin():
     database_url = "http://"+database_host+":"+database_port+"/token"
     database_header = {'content-type': 'application/json'}
     database_data = {
-        "user_id": me_response_json["id"], "service": "linkedin", "token": access_token}
+        "user_id": me_response_json["name"], "service": "auth0", "token": access_token}
     database_response = requests.post(
         url=database_url, data=json.dumps(database_data), headers=database_header)
     app.logger.info(database_response.text)
