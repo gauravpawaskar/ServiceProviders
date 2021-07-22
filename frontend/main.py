@@ -13,6 +13,10 @@ app.secret_key = ''.join(random.choices(
     string.ascii_uppercase + string.ascii_lowercase + string.digits, k=15))
 
 
+def logInfo(message):
+    app.logger.info(message)
+
+
 def get_service_host(service):
     database_host = os.environ['DATABASE_HOST']
     database_port = os.environ['DATABASE_PORT']
@@ -47,7 +51,7 @@ def home():
         return "User is not logged in"
 
 
-@app.route('/oauthsetup', methods=["POST"])
+@app.route('/setup', methods=["POST"])
 def oauthsetup():
     setup_json = request.get_json()
     service_name = setup_json["service"]
@@ -60,8 +64,9 @@ def oauthsetup():
         service_data = {"client_id": client_id, "client_secret": client_secret}
         service_respose = requests.post(
             url=service_url, headers=service_headers, data=json.dumps(service_data))
+        logInfo(service_respose.text)
         service_respose_json = service_respose.json()
-        app.logger.info(service_respose_json)
+        logInfo(service_respose_json)
         if service_respose_json["status"] == "success":
             return json.dumps({"status": "success"})
         else:
@@ -76,7 +81,7 @@ def oauth(service):
     service_host, service_port = get_service_host(service)
     if service_host and service_port:
         service_url = "http://"+service_host+":"+service_port+"/processlogin" + \
-            request.full_path.replace('/oauth/linkedin', '')
+            request.full_path.replace('/oauth/'+service, '')
         service_response = requests.get(
             url=service_url, headers=request.headers)
         if service_response.status_code == 200:
@@ -88,6 +93,12 @@ def oauth(service):
             return "Something went wrong in login!"
     else:
         return "Not able to detect {} service".format(service)
+
+
+@app.route('/saml/<service>')
+def saml(service):
+    # code to call service discovery from db and call
+    return request.get_data()
 
 
 if __name__ == "__main__":
