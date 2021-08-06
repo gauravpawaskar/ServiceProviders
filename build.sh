@@ -12,6 +12,10 @@ echo "**** Building Other services from services dir ****"
 cd services
 for d in *; do
     cd $d
+    if [ $d = "auth0saml" ]
+    then
+        ./gradlew clean build
+    fi
     docker build -t flagprotectors/$d:latest .
     docker push flagprotectors/$d:latest
     cd ..

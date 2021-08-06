@@ -64,8 +64,9 @@ def oauthsetup():
         service_data = {"client_id": client_id, "client_secret": client_secret}
         service_respose = requests.post(
             url=service_url, headers=service_headers, data=json.dumps(service_data))
-        logInfo(service_respose.text)
         service_respose_json = service_respose.json()
+        logInfo(service_url)
+        logInfo(service_data)
         logInfo(service_respose_json)
         if service_respose_json["status"] == "success":
             return json.dumps({"status": "success"})
@@ -95,10 +96,24 @@ def oauth(service):
         return "Not able to detect {} service".format(service)
 
 
-@app.route('/saml/<service>')
+@app.route('/saml/<service>', methods=["POST"])
 def saml(service):
     # code to call service discovery from db and call
-    return request.get_data()
+    service_host, service_port = get_service_host(service)
+    if service_host and service_port:
+        service_url = "http://"+service_host+":"+service_port+"/processlogin" + \
+            request.full_path.replace('/saml/'+service, '')
+        service_response = requests.post(
+            url=service_url, headers=request.headers, data=request.get_data())
+        if service_response.status_code == 200:
+            session["loggedin"] = True
+            session["service"] = service
+            session["service_data"] = service_response.text
+            return redirect(url_for('home'))
+        else:
+            return "Something went wrong in login!"
+    else:
+        return "Not able to detect {} service".format(service)
 
 
 if __name__ == "__main__":
