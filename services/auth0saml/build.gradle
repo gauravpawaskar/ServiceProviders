@@ -1,0 +1,32 @@
+plugins {
+	id 'org.springframework.boot' version '2.5.3'
+	id 'io.spring.dependency-management' version '1.0.11.RELEASE'
+	id 'java'
+}
+
+jar {
+    archiveBaseName = 'auth0saml'
+    archiveVersion =  '0.0.1'
+}
+
+//group = 'com.flagprotectors'
+//version = '0.0.1-SNAPSHOT'
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+repositories {
+	mavenCentral()
+}
+
+dependencies {
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+	implementation group: 'org.json', name: 'json', version: '20210307'
+	implementation group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.5.13'
+	developmentOnly 'org.springframework.boot:spring-boot-devtools'
+	//providedRuntime 'org.springframework.boot:spring-boot-starter-tomcat'
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+}
+
+test {
+	useJUnitPlatform()
+}

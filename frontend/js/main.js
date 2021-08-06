@@ -47,18 +47,19 @@ function set_up_service(service_name, client_id, client_secret) {
 }
 
 function redirectLogin(app) {
-  if (app == "linkedin") {
-    client_id = document.getElementById(app + "_clientid").value;
-    client_secret = document.getElementById(app + "_clientsecret").value;
-    checkboxes = document.getElementsByName(app + "_scope");
-    checkboxesChecked_scope = [];
-    for (var i = 0; i < checkboxes.length; i++) {
-      if (checkboxes[i].checked) {
-        checkboxesChecked_scope.push(checkboxes[i].value);
-      }
+  client_id = document.getElementById(app + "_clientid").value;
+  client_secret = document.getElementById(app + "_clientsecret").value;
+  checkboxes = document.getElementsByName(app + "_scope");
+  checkboxesChecked_scope = [];
+  for (var i = 0; i < checkboxes.length; i++) {
+    if (checkboxes[i].checked) {
+      checkboxesChecked_scope.push(checkboxes[i].value);
     }
-    set_up_service(app, client_id, client_secret);
-    checkboxesChecked_scope_string = checkboxesChecked_scope.join("%20");
+  }
+  set_up_service(app, client_id, client_secret);
+  checkboxesChecked_scope_string = checkboxesChecked_scope.join("%20");
+  url_string = "";
+  if (app == "linkedin") {
     url_string =
       "https://www.linkedin.com/oauth/v2/authorization?response_type=code&client_id=" +
       client_id +
@@ -66,19 +67,7 @@ function redirectLogin(app) {
       app +
       "&state=foobar&scope=" +
       checkboxesChecked_scope_string;
-    location.replace(url_string);
   } else if (app == "auth0") {
-    client_id = document.getElementById(app + "_clientid").value;
-    client_secret = document.getElementById(app + "_clientsecret").value;
-    checkboxes = document.getElementsByName(app + "_scope");
-    checkboxesChecked_scope = [];
-    for (var i = 0; i < checkboxes.length; i++) {
-      if (checkboxes[i].checked) {
-        checkboxesChecked_scope.push(checkboxes[i].value);
-      }
-    }
-    set_up_service(app, client_id, client_secret);
-    checkboxesChecked_scope_string = checkboxesChecked_scope.join("%20");
     url_string =
       "https://flagprotectors.us.auth0.com/authorize?response_type=code&client_id=" +
       client_id +
@@ -87,7 +76,12 @@ function redirectLogin(app) {
       "&scope=" +
       checkboxesChecked_scope_string +
       "&state=xyzABC123";
-    alert(url_string);
-    location.replace(url_string);
+  } else if (app == "auth0saml") {
+    url_string =
+      "https://flagprotectors.us.auth0.com/samlp/" +
+      client_id +
+      "?connection=Username-Password-Authentication";
   }
+  alert(url_string);
+  location.replace(url_string);
 }

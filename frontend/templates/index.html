@@ -14,6 +14,7 @@
         <option value="none" selected>None</option>
         <option value="linkedin">LinkedIn</option>
         <option value="auth0">Auth0</option>
+        <option value="auth0saml">Auth0 SAML</option>
     </select>
     <div id="linkedin" style="display: none;">
         <br>
@@ -39,6 +40,17 @@
         <input type="checkbox" id="auth0_scope" name="auth0_scope" value="profile">profile</input>
         <input type="checkbox" id="auth0_scope" name="auth0_scope" value="email">email</input>
         <button onclick="redirectLogin('auth0')">Login With auth0</button>
+    </div>
+
+    <div id="auth0saml" style="display: none;">
+        <br>
+        <label for="auth0saml_clientid">Client_ID</label><input type="text" name="auth0saml_clientid" id="auth0saml_clientid"><br>
+
+        <label for="auth0saml_clientsecret">Client_Secret</label><input type="text" name="auth0saml_clientsecret" id="auth0saml_clientsecret"><br>
+
+        <label>Scope</label>
+        <input type="checkbox" id="auth0saml_scope" name="auth0saml_scope" value="placeholder">placeholder</input>
+        <button onclick="redirectLogin('auth0saml')">Login With auth0 SAML</button>
     </div>
 </body>
 </html>
