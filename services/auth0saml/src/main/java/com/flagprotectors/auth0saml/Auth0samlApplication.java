@@ -28,9 +28,6 @@ public class Auth0samlApplication {
 		String service_host = System.getenv("SERVICE_HOST");
 		String service_port = System.getenv("SERVICE_PORT");
 
-		System.out.println(database_host);
-		System.out.println(System.getenv("DATABASE_HOST"));
-
 		if (database_host == null) {
 			database_host = "0.0.0.0";
 			database_port = "5000";

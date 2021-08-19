@@ -16,7 +16,7 @@ public class SetUp {
 
     @PostMapping(value = "/setup", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity setUp(@RequestBody Map<String, Object> payload) {
-        System.out.println(payload.toString());
+        // System.out.println(payload.toString());
         System.setProperty("client_secret", payload.get("client_secret").toString());
         System.setProperty("client_id", payload.get("client_id").toString());
         JSONObject jsonbject = new JSONObject();
